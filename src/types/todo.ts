@@ -4,9 +4,9 @@ export interface Todo {
   id: string;
   title: string;
   completed: boolean;
-  createdAt: string;
   priority: Priority;
-  dueDate?: string;
+  dueDate: string;
+  createdAt: string;
 }
 
 export interface TodoStore {
@@ -14,7 +14,7 @@ export interface TodoStore {
   addTodo: (todo: Omit<Todo, 'id' | 'createdAt'>) => void;
   toggleTodo: (id: string) => void;
   deleteTodo: (id: string) => void;
-  editTodo: (id: string, todo: Partial<Todo>) => void;
+  updateTodoTitle: (id: string, title: string) => void;
   filterTodos: (filter: 'all' | 'active' | 'completed') => Todo[];
   sortTodos: (by: 'priority' | 'dueDate' | 'createdAt') => Todo[];
 } 
