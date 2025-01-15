@@ -1,101 +1,77 @@
-import Image from "next/image";
+'use client';
+
+import { useState } from 'react';
+import { useTodoStore } from '@/store/todoStore';
+import AddTodo from '@/components/AddTodo';
+import TodoItem from '@/components/TodoItem';
+import TodoFilters from '@/components/TodoFilters';
+import { Priority } from '@/types/todo';
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
+  const [sortBy, setSortBy] = useState<'priority' | 'dueDate' | 'createdAt'>('priority');
+  const [priorityFilter, setPriorityFilter] = useState<Priority | 'all'>('all');
+  const { sortTodos } = useTodoStore();
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const sortedTodos = sortTodos(sortBy);
+  const displayedTodos = sortedTodos.filter(todo => {
+    // Status filter
+    if (filter === 'active' && todo.completed) return false;
+    if (filter === 'completed' && !todo.completed) return false;
+
+    // Priority filter
+    if (priorityFilter !== 'all' && todo.priority !== priorityFilter) return false;
+
+    return true;
+  });
+
+  return (
+    <main className="min-h-screen bg-gradient-to-br from-[#e6ccb2]/30 via-white to-[#7f4f24]/5">
+      <div className="mx-auto max-w-4xl px-4 py-12">
+        <div className="mb-12 text-center">
+          <h1 className="mb-3 bg-gradient-to-r from-[#7f4f24] to-[#7f4f24]/70 bg-clip-text text-5xl font-bold text-transparent">
+            Task Manager
+          </h1>
+          <p className="text-[#7f4f24]/70">
+            Organize your tasks efficiently and boost your productivity
+          </p>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+
+        <div className="space-y-8">
+          <div className="overflow-hidden rounded-2xl border border-[#e6ccb2] bg-white/70 p-6 shadow-lg shadow-[#7f4f24]/5 backdrop-blur-xl">
+            <AddTodo />
+          </div>
+
+          <TodoFilters
+            filter={filter}
+            setFilter={setFilter}
+            sortBy={sortBy}
+            setSortBy={setSortBy}
+            priorityFilter={priorityFilter}
+            setPriorityFilter={setPriorityFilter}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+
+          <div className="space-y-4">
+            {displayedTodos.length === 0 ? (
+              <div className="flex min-h-[200px] items-center justify-center rounded-2xl border border-dashed border-[#e6ccb2] bg-white/50 p-8 text-center backdrop-blur-sm">
+                <p className="text-[#7f4f24]/70">
+                  {filter === 'all'
+                    ? priorityFilter === 'all'
+                      ? 'No tasks yet. Add your first task above!'
+                      : `No ${priorityFilter} priority tasks found.`
+                    : filter === 'active'
+                    ? `No active ${priorityFilter === 'all' ? '' : priorityFilter + ' priority '}tasks.`
+                    : `No completed ${priorityFilter === 'all' ? '' : priorityFilter + ' priority '}tasks.`}
+                </p>
+              </div>
+            ) : (
+              displayedTodos.map((todo) => (
+                <TodoItem key={todo.id} todo={todo} />
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+    </main>
   );
 }
