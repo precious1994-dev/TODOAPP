@@ -4,6 +4,12 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  // Ensure trailing slashes for better compatibility
+  trailingSlash: true,
+  // Disable server components since we're doing static export
+  experimental: {
+    appDir: true,
+  },
 }
 
 module.exports = nextConfig 
