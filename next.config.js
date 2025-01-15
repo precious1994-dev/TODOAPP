@@ -1,14 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
+  // Remove static export
   images: {
-    unoptimized: true,
-  },
-  // Ensure trailing slashes for better compatibility
-  trailingSlash: true,
-  // Disable server components since we're doing static export
-  experimental: {
-    appDir: true,
+    domains: [],
   },
 }
 
